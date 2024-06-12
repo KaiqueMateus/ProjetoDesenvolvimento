@@ -252,7 +252,6 @@ def configure_frame_direita(parent):
     entry_funcao = ctk.CTkEntry(frame_admissao, fg_color="white", text_color="black", height=30, width=200)
     entry_funcao.grid(row=0, column=3, padx=10, pady=5, sticky="e")
 
-# Configura os frames esquerdo e direito
 configure_frame_esquerda(janela)
 configure_frame_direita(janela)
 
