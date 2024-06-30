@@ -1,6 +1,6 @@
-Instalar Dependências
+1. Instalar Dependências
 
-Antes de executar a aplicação, instale as dependências necessárias. Certifique-se de que você tem o pip instalado:
+2. Antes de executar a aplicação, instale as dependências necessárias. Certifique-se de que você tem o pip instalado:
 
   pip3 install -r requirements.txt
 
@@ -8,7 +8,7 @@ Antes de executar a aplicação, instale as dependências necessárias. Certifiq
 
 Para rodar a aplicação, execute o script principal app.py:
 
-  python3 app.py
+  python3 unificacao.py
 
 4. Verificar o Funcionamento da Aplicação
 
