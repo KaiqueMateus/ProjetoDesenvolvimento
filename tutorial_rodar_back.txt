@@ -8,7 +8,7 @@
 
 Para rodar a aplicação, execute o script principal app.py:
 
-  python3 unificacao.py
+  python3 app.py
 
 4. Verificar o Funcionamento da Aplicação
 

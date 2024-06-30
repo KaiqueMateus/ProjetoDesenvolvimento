@@ -32,9 +32,9 @@ def editar_cliente():
 
 def agenda():
     apagar_frames_para_o_proximo()
-    frame_agendar()
+    frame_agenda()
 
-def frame_agendar():
+def editar_agendar():
     apagar_frames_para_o_proximo()
     frame_editar_agenda()
 
@@ -477,7 +477,7 @@ def frame_agenda():
     texto_direita = ctk.CTkLabel(frame, text="AGENDAMENTO", font=("Arial", 30), text_color="white")
     texto_direita.pack(padx=10, pady=10)
 
-    subtitulo2 = ctk.CTkLabel(frame, text="Dados do cliente", text_color="red", font=("Arial", 18))
+    subtitulo2 = ctk.CTkLabel(frame, text="Identificador", text_color="red", font=("Arial", 18))
     subtitulo2.pack(padx=10, pady=(5, 5))
 
     linha2 = ctk.CTkFrame(frame, height=2, width=380, fg_color="red")
@@ -500,27 +500,27 @@ def frame_agenda():
     linha4 = ctk.CTkFrame(frame, height=2, width=380, fg_color="red")
     linha4.pack(padx=10, pady=(5, 20))
 
-    frame_endereco = ctk.CTkFrame(frame, corner_radius=10, fg_color="#fa7f72")
-    frame_endereco.pack(padx=10, pady=10, expand=False, fill='both')
+    frame_dados_agendamento = ctk.CTkFrame(frame, corner_radius=10, fg_color="#fa7f72")
+    frame_dados_agendamento.pack(padx=10, pady=10, expand=False, fill='both')
 
     # Linha 1 (Endereço)
-    label_CEP = ctk.CTkLabel(frame_endereco, text="CEP:", font=("Arial", 30), text_color="white")
-    label_CEP.grid(row=0, column=0, padx=10, pady=5, sticky="w")
-    entry_CEP = ctk.CTkEntry(frame_endereco, fg_color="white", text_color="black", height=30, width=200)
-    entry_CEP.grid(row=0, column=1, padx=10, pady=5, sticky="e")
+    label_Data_Original = ctk.CTkLabel(frame_dados_agendamento, text="Data original:", font=("Arial", 30), text_color="white")
+    label_Data_Original.grid(row=0, column=0, padx=10, pady=5, sticky="w")
+    entry_Data_original = ctk.CTkEntry(frame_dados_agendamento, fg_color="white", text_color="black", height=30, width=200)
+    entry_Data_original.grid(row=0, column=1, padx=10, pady=5, sticky="e")
 
-    label_Bairro = ctk.CTkLabel(frame_endereco, text="Bairro:", font=("Arial", 30), text_color="white")
+    label_Bairro = ctk.CTkLabel(frame_dados_agendamento, text="Nova Data:", font=("Arial", 30), text_color="white")
     label_Bairro.grid(row=0, column=2, padx=10, pady=5, sticky="w")
-    entry_Bairro = ctk.CTkEntry(frame_endereco, fg_color="white", text_color="black", height=30, width=200)
+    entry_Bairro = ctk.CTkEntry(frame_dados_agendamento, fg_color="white", text_color="black", height=30, width=200)
     entry_Bairro.grid(row=0, column=3, padx=10, pady=5, sticky="e")
 
     # Linha 2 (Endereço)
-    label_logradouro = ctk.CTkLabel(frame_endereco, text="Logradouro:", font=("Arial", 30), text_color="white")
-    label_logradouro.grid(row=1, column=0, padx=10, pady=5, sticky="w")
-    entry_logradouro = ctk.CTkEntry(frame_endereco, fg_color="white", text_color="black", height=30, width=200)
-    entry_logradouro.grid(row=1, column=1, padx=10, pady=5, sticky="e")
+    label_horario = ctk.CTkLabel(frame_dados_agendamento, text="Horario:", font=("Arial", 30), text_color="white")
+    label_horario.grid(row=1, column=0, padx=10, pady=5, sticky="w")
+    entry_horario = ctk.CTkEntry(frame_dados_agendamento, fg_color="white", text_color="black", height=30, width=200)
+    entry_horario.grid(row=1, column=1, padx=10, pady=5, sticky="e")
 
-    label_Numero = ctk.CTkLabel(frame_endereco, text="Número:", font=("Arial", 30), text_color="white")
+    label_ = ctk.CTkLabel(frame_dados_agendamento, text="Número:", font=("Arial", 30), text_color="white")
     label_Numero.grid(row=1, column=2, padx=10, pady=5, sticky="w")
     entry_Numero = ctk.CTkEntry(frame_endereco, fg_color="white", text_color="black", height=30, width=200)
     entry_Numero.grid(row=1, column=3, padx=10, pady=5, sticky="e")
@@ -677,161 +677,129 @@ subtitulo3.pack(padx=10, pady=(5, 5))
 linha = ctk.CTkFrame(frameEsquerda, height=2, width=300, fg_color="white")
 linha.pack(padx=10, pady=(5, 20))
 
+agendar = ctk.CTkButton(
+    frameEsquerda, text="AGENDAR", command=agenda,
+    width=350, height=50,
+    fg_color="#fa7f72", hover_color="lightpink",
+    text_color="white", corner_radius=10, border_color="grey", border_width=2,
+    font=("Arial", 30, "bold")
+)
+agendar.pack(padx=10, pady=10)
+
+def on_enter_agendar(event):
+    agendar.configure(fg_color="lightpink", text_color="darkred")
+
+def on_leave_agendar(event):
+    agendar.configure(fg_color="#fa7f72", text_color="white")
+
+agendar.bind("<Enter>", on_enter_agendar)
+agendar.bind("<Leave>", on_leave_agendar)
+
 ###############################################################################################################
 
 ############# Adiciona o calendário
-calendar_frame = ctk.CTkFrame(ctk.frame, bg="black")
-calendar_frame.pack(fill="both", expand=True, padx=20, pady=20)
+#calendar_frame = ctk.CTkFrame(frameAuxiliar, fg_color="black")
+#calendar_frame.pack(fill="both", expand=True, padx=20, pady=20)
 
 
 # Configurando o calendário interativo
-today = datetime.date.today()
-current_month = today.month
-current_year = today.year
+#today = datetime.date.today()
+#current_month = today.month
+#current_year = today.year
 
-months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
+#months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
 
-def update_calendar(month, year):
-        for widget in calendar_frame.winfo_children():
-            widget.destroy()
+#def update_calendar(month, year):
+#        for widget in calendar_frame.winfo_children():
+#            widget.destroy()
 
-        calendar_label = ctk.Label(calendar_frame, text=f"{months[month - 1]} {year}", font=("Arial", 24), bg="black", fg="white")
-        calendar_label.pack(pady=20)
+#        calendar_label = ctk.CTkLabel(calendar_frame, text=f"{months[month - 1]} {year}", font=("Arial", 24), bg_color="black", fg_color="white")
+#        calendar_label.pack(pady=20)
 
         # Função para lidar com o clique em um dia do calendário
-        def day_clicked(day):
-            # Cria uma janela para entrada de texto
-            entry_window = ctk.Toplevel(janela)
-            entry_window.geometry("300x150")
-            entry_window.title(f"Informações do dia {day}")
+#        def day_clicked(day):
+#           # Cria uma janela para entrada de texto
+#            entry_window = ctk.Toplevel(janela)
+#            entry_window.geometry("300x150")
+#            entry_window.title(f"Informações do dia {day}")
 
             # Texto explicativo
-            info_label = ctk.Label(entry_window, text=f"Informe as informações para o dia {day}:", font=("Arial", 12))
-            info_label.pack(pady=10)
+#            info_label = ctk.Label(entry_window, text=f"Informe as informações para o dia {day}:", font=("Arial", 12))
+#            info_label.pack(pady=10)
 
             # Campo de entrada de texto
-            info_entry = ctk.Entry(entry_window, width=30)
-            info_entry.pack(pady=10)
+#            info_entry = ctk.Entry(entry_window, width=30)
+#            info_entry.pack(pady=10)
 
             # Botão para salvar as informações
-            def save_info():
-                info = info_entry.get()
+#            def save_info():
+#                info = info_entry.get()
                 # Aqui você pode salvar as informações em algum lugar (banco de dados, arquivo, etc.)
-                print(f"Informações para o dia {day} salvas: {info}")
-                entry_window.destroy()
+#                print(f"Informações para o dia {day} salvas: {info}")
+#                entry_window.destroy()
 
-            save_button = ctk.Button(entry_window, text="Salvar", command=save_info)
-            save_button.pack(pady=10)
+#            save_button = ctk.Button(entry_window, text="Salvar", command=save_info)
+#            save_button.pack(pady=10)
 
         # Configuração do calendário com dias
-        days_frame = ctk.Frame(calendar_frame, bg="black")
-        days_frame.pack()
+#        days_frame = ctk.CTkFrame(calendar_frame, bg_color="black")
+#        days_frame.pack()
 
         # Obtém o número de dias no mês atual usando o módulo calendar
-        num_days = calendar.monthrange(year, month)[1]
+#        num_days = calendar.monthrange(year, month)[1]
 
-        day_colors = {
-            "Monday": "#2274a5",
-            "Tuesday": "#32936f",
-            "Wednesday": "#fdae61",
-            "Thursday": "#e94f37",
-            "Friday": "#1e434c",
-            "Saturday": "#b4656f",
-            "Sunday": "#465362"
-        }
+#        day_colors = {
+#            "Monday": "#2274a5",
+#            "Tuesday": "#32936f",
+#            "Wednesday": "#fdae61",
+#            "Thursday": "#e94f37",
+#            "Friday": "#1e434c",
+#            "Saturday": "#b4656f",
+#            "Sunday": "#465362"
+#        }
 
-        janela.style = ctk.Style()
+        #janela.style = ctk.CTkStyle()
+
         
         # Cria botões para cada dia do mês
-        for day in range(1, num_days + 1):
-            day_of_week = calendar.weekday(year, month, day)
-            day_name = calendar.day_name[day_of_week]
-            janela.style.configure(f"{day_name}.TButton", foreground="white", background=day_colors[day_name], font=("Arial", 12, "bold"))
+#        for day in range(1, num_days + 1):
+#            day_of_week = calendar.weekday(year, month, day)
+#            day_name = calendar.day_name[day_of_week]
+#            janela.style.configure(f"{day_name}.TButton", foreground="white", background=day_colors[day_name], font=("Arial", 12, "bold"))
             
-            day_button = ctk.Button(days_frame, text=str(day), width=10,  # Aumenta a largura dos botões
-                                    style=f'{day_name}.TButton',  # Aplica o estilo baseado no dia da semana
-                                    command=lambda d=day: day_clicked(d))
-            day_button.grid(row=(day - 1) // 7, column=(day - 1) % 7, padx=10, pady=10)  # Aumenta o espaçamento entre os botões
+#            day_button = ctk.Button(days_frame, text=str(day), width=10,  # Aumenta a largura dos botões
+#                                    style=f'{day_name}.TButton',  # Aplica o estilo baseado no dia da semana
+#                                    command=lambda d=day: day_clicked(d))
+#            day_button.grid(row=(day - 1) // 7, column=(day - 1) % 7, padx=10, pady=10)  # Aumenta o espaçamento entre os botões
 
-def prev_month():
+#def prev_month():
     #nonlocal current_month, current_year
-    if current_month == 1:
-            current_month = 12
-            current_year -= 1
-    else:
-            current_month -= 1
-    update_calendar(current_month, current_year)
+#    if current_month == 1:
+#            current_month = 12
+#            current_year -= 1
+#   else:
+#            current_month -= 1
+#    update_calendar(current_month, current_year)
 
-def next_month():
-        #nonlocal current_month, current_year
-        if current_month == 12:
-            current_month = 1
-            current_year += 1
-        else:
-            current_month += 1
-        update_calendar(current_month, current_year)
+#def next_month():
+ #       #nonlocal current_month, current_year
+ #       if current_month == 12:
+ #           current_month = 1
+ #           current_year += 1
+ #       else:
+ #           current_month += 1
+ #       update_calendar(current_month, current_year)
 
     # Botões para mudar de mês
-prev_button = ctk.Button(calendar_frame, text="Anterior", command=prev_month)
-prev_button.pack(side="left", padx=10)
+#prev_button = ctk.CTkButton(calendar_frame, text="Anterior", command=prev_month)
+#prev_button.pack(side="left", padx=10)
 
-next_button = ctk.Button(calendar_frame, text="Próximo", command=next_month)
-next_button.pack(side="right", padx=10)
+#next_button = ctk.CTkButton(calendar_frame, text="Próximo", command=next_month)
+#next_button.pack(side="right", padx=10)
 
-update_calendar(current_month, current_year)
+#update_calendar(current_month, current_year)
 
 ###############################################################################################################
-
-#AGENDAMENTO
-def frame_agendar():
-    
-    frame = ctk.CTkFrame(frameAuxiliar, corner_radius=10, fg_color=frame_cor)
-    frame.pack(side="left", fill="both", expand=True, padx=20, pady=20)
-
-# Conteúdo do frame à direita
-    texto_direita = ctk.CTkLabel(frame, text="AGENDAMENTO", font=("Arial", 30), text_color="white")
-    texto_direita.pack(padx=10, pady=10)
-
-# Linha 1
-    label_nome = ctk.CTkLabel(frame_agendar, text="Nome do Cliente:", font=("Arial", 30), text_color="white")
-    label_nome.grid(row=0, column=0, padx=10, pady=5, sticky="w")
-    entry_nome = ctk.CTkEntry(frame_agendar,  fg_color="white", text_color="black", height=30, width=200)
-    entry_nome.grid(row=0, column=1, padx=10, pady=5, sticky="e")
-
-# Linha 2
-    label_telefone = ctk.CTkLabel(frame_agendar, text="Telefone:", font=("Arial", 30), text_color="white")
-    label_telefone.grid(row=1, column=0, padx=10, pady=5, sticky="w")
-    entry_telefone = ctk.CTkEntry(frame_agendar,  fg_color="white", text_color="black", height=30, width=200)
-    entry_telefone.grid(row=1, column=1, padx=10, pady=5, sticky="e")
-
-# Linha 3
-    label_Data = ctk.CTkLabel(frame_agendar, text="Data:", font=("Arial", 30), text_color="white")
-    label_Data.grid(row=2, column=0, padx=10, pady=5, sticky="w")
-    label_Data = ctk.CTkEntry(frame_agendar,  fg_color="white", text_color="black", height=30, width=200)
-    label_Data.grid(row=2, column=1, padx=10, pady=5, sticky="e")
-
-# Linha 4
-    label_Horário = ctk.CTkLabel(frame_agendar, text="Horário:", font=("Arial", 30), text_color="white")
-    label_Horário.grid(row=0, column=2, padx=10, pady=5, sticky="w")
-    entry_Horário = ctk.CTkEntry(frame_agendar, fg_color="white", text_color="black", height=30, width=200)
-    entry_Horário.grid(row=0, column=3, padx=10, pady=5, sticky="e")
-
-# Linha 5
-    label_Procediemnto = ctk.CTkLabel(frame_agendar, text="Procedimento:", font=("Arial", 30), text_color="white")
-    label_Procediemnto.grid(row=1, column=0, padx=10, pady=5, sticky="w")
-    entry_Procedimento = ctk.CTkEntry(frame_agendar, fg_color="white", text_color="black", height=30, width=200)
-    entry_Procedimento.grid(row=1, column=1, padx=10, pady=5, sticky="e")
-
-# Linha 6
-    label_Profissional = ctk.CTkLabel(frame_agendar, text="Data de Nascimento:", font=("Arial", 30), text_color="white")
-    label_Profissional.grid(row=2, column=2, padx=10, pady=5, sticky="w")
-    entry_Profissional = ctk.CTkEntry(frame_agendar, fg_color="white", text_color="black", height=30, width=200)
-    entry_Profissional.grid(row=2, column=3, padx=10, pady=5, sticky="e")
-
-agendar = ctk.CTkButton(frame_agendar, font=('Crimson pro', 30), text="Agendar", command=teste,
-                      width=303, height=66, fg_color="#DF4621")
-agendar.pack(padx=250, pady=(114, 5))
-
 
 # EDITAR AGENDA
 def frame_editar_agenda():
@@ -864,22 +832,6 @@ def frame_editar_agenda():
 
 ###############################################################################################################
 
-agendar = ctk.CTkButton(
-    frameEsquerda, text="AGENDAR", command=agenda,
-    width=350, height=50,
-    fg_color="#fa7f72", hover_color="lightpink",
-    text_color="white", corner_radius=10, border_color="grey", border_width=2,
-    font=("Arial", 30, "bold")
-)
-agendar.pack(padx=10, pady=10)
 
-def on_enter_agendar(event):
-    agendar.configure(fg_color="lightpink", text_color="darkred")
-
-def on_leave_agendar(event):
-    agendar.configure(fg_color="#fa7f72", text_color="white")
-
-agendar.bind("<Enter>", on_enter_agendar)
-agendar.bind("<Leave>", on_leave_agendar)
 
 janela.mainloop()
