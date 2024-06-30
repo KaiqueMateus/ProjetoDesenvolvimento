@@ -1,0 +1,54 @@
+1. Instalar Dependências
+
+2. Antes de executar a aplicação, instale as dependências necessárias. Certifique-se de que você tem o pip instalado:
+
+  pip3 install -r requirements.txt
+
+3. Executar o Script Principal
+
+Para rodar a aplicação, execute o script principal app.py:
+
+  python3 app.py
+
+4. Verificar o Funcionamento da Aplicação
+
+Criar um Cliente
+
+Para criar um novo cliente, use o comando curl abaixo:
+
+  linux:
+  curl -X POST http://localhost:5000/clientes -H "Content-Type: application/json" -d '{"nome":"João","email":"joao@example.com","telefone":"123456789","sexo":"Masculino","cpf":"12345678901","data_nascimento":"2000-01-01","cep":"12345678","bairro":"Centro","logradouro":"Rua A","numero":"123"}'
+
+Verificar um Cliente Criado
+
+Para verificar um cliente criado, use o comando curl abaixo, substituindo 1 pelo ID do cliente que deseja verificar:
+
+  linux:
+    curl -X GET http://localhost:5000/clientes/1
+
+Criar um Funcionário
+
+Para criar um novo funcionário, use o comando curl abaixo:
+
+  linux:
+    curl -X POST http://localhost:5000/funcionarios -H "Content-Type: application/json" -d '{"nome":"Maria","email":"maria@example.com","telefone":"987654321","sexo":"Feminino","cpf":"98765432100","data_nascimento":"1990-02-01","cep":"87654321","bairro":"Bairro B","logradouro":"Rua B","numero":"456","data_admissao":"2022-01-01","funcao":"Cabeleireira"}'
+
+Criar um Agendamento
+
+Para criar um novo agendamento, use o comando curl abaixo:
+
+  linux:
+    curl -X POST http://localhost:5000/agendamentos -H "Content-Type: application/json" -d '{"cliente_id":1,"funcionario_id":1,"data_agendamento":"2022-07-01 10:00:00","servico":"Corte de Cabelo"}'
+
+5. Solução de Problemas
+Erro 500 - Internal Server Error
+
+Se encontrar um erro 500, verifique os logs do servidor Flask para obter detalhes sobre o erro. Certifique-se de que as datas estão sendo enviadas no formato correto e que todas as dependências estão instaladas corretamente.
+Outros Problemas
+
+Verifique se todas as rotas estão definidas corretamente e se você está utilizando os métodos HTTP apropriados para cada rota.
+6. Encerramento
+
+Se precisar encerrar a aplicação, pressione Ctrl + C no terminal onde o script app.py está sendo executado.
+
+Para mais informações ou ajuda, segue o link do chat gpt utilizado: https://chatgpt.com/share/d00cf482-8523-4d1d-943d-141ee3c4a7a0
