@@ -35,10 +35,55 @@ def get_cliente(id):
         'numero': cliente.numero
     })
 
+@bp.route('/clientes/cpf/<string:cpf>', methods=['GET'])
+def get_cliente_by_cpf(cpf):
+    cliente = Cliente.query.filter_by(cpf=cpf).first_or_404()
+    return jsonify({
+        'id': cliente.id,
+        'nome': cliente.nome,
+        'email': cliente.email,
+        'telefone': cliente.telefone,
+        'sexo': cliente.sexo,
+        'cpf': cliente.cpf,
+        'data_nascimento': cliente.data_nascimento.strftime('%Y-%m-%d'),
+        'cep': cliente.cep,
+        'bairro': cliente.bairro,
+        'logradouro': cliente.logradouro,
+        'numero': cliente.numero
+    })
+
 @bp.route('/clientes/<int:id>', methods=['PUT'])
 def update_cliente(id):
     data = request.get_json()
     cliente = Cliente.query.get_or_404(id)
+    try:
+        # Convertendo a string data_nascimento para um objeto date
+        if 'data_nascimento' in data:
+            data['data_nascimento'] = datetime.strptime(data['data_nascimento'], '%d/%m/%Y').date()
+        for key, value in data.items():
+            setattr(cliente, key, value)
+        db.session.commit()
+        return jsonify({
+            'id': cliente.id,
+            'nome': cliente.nome,
+            'email': cliente.email,
+            'telefone': cliente.telefone,
+            'sexo': cliente.sexo,
+            'cpf': cliente.cpf,
+            'data_nascimento': cliente.data_nascimento.strftime('%Y-%m-%d'),
+            'cep': cliente.cep,
+            'bairro': cliente.bairro,
+            'logradouro': cliente.logradouro,
+            'numero': cliente.numero
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 400
+
+@bp.route('/clientes/cpf/<string:cpf>', methods=['PUT'])
+def update_cliente_by_cpf(cpf):
+    data = request.get_json()
+    cliente = Cliente.query.filter_by(cpf=cpf).first_or_404()
     try:
         # Convertendo a string data_nascimento para um objeto date
         if 'data_nascimento' in data:

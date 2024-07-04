@@ -8,6 +8,10 @@ from routes import bp as main_bp
 import threading
 from waitress import serve
 import logging
+import requests
+from tkinter import messagebox
+import pdb
+from datetime import datetime
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -199,8 +203,29 @@ def create_interface():
         entry_Numero = ctk.CTkEntry(frame_endereco, fg_color="white", text_color="black", height=30, width=200)
         entry_Numero.grid(row=1, column=3, padx=10, pady=5, sticky="e")
 
+        def cadastrar_cliente():
+            data = {
+                "nome": entry_nome.get(),
+                "email": entry_email.get(),
+                "telefone": int(entry_telefone.get()),
+                "sexo": sexo_var.get(),
+                "cpf": entry_cpf.get(),
+                "data_nascimento": datetime.strptime(entry_data_nascimento.get(), "%d/%m/%Y").date().isoformat(),
+                "cep": entry_CEP.get(),
+                "bairro": entry_Bairro.get(),
+                "logradouro": entry_logradouro.get(),
+                "numero": entry_Numero.get()
+            }
+            response = requests.post("http://localhost:5000/clientes", json=data)
+            if response.status_code == 201:
+                print(response)
+                messagebox.showinfo("Sucesso", "Cliente cadastrado com sucesso!")
+            else:
+                print(response)
+                messagebox.showerror("Erro", "Falha ao cadastrar cliente.")
+
         botao_cadastrar = ctk.CTkButton(frame, text="Cadastrar", font=("Arial", 30), text_color="white",
-                                        fg_color='#DF4621')
+                                        fg_color='#DF4621', command=cadastrar_cliente)
         botao_cadastrar.pack(after=frame_endereco, padx=10, pady=15, side='bottom', anchor='s')
 
         botao_editar = ctk.CTkButton(frame, text="editar cliente", font=("Arial", 30),
@@ -216,11 +241,24 @@ def create_interface():
         texto_direita = ctk.CTkLabel(frame, text="EDITAR CLIENTE", font=("Arial", 30), text_color="white")
         texto_direita.pack(padx=10, pady=10)
 
-        subtitulo2 = ctk.CTkLabel(frame, text="Dados Pessoais", text_color="red", font=("Arial", 18))
+        subtitulo2 = ctk.CTkLabel(frame, text="Buscar Cliente por CPF", text_color="white", font=("Arial", 18))
         subtitulo2.pack(padx=10, pady=(5, 5))
 
-        linha2 = ctk.CTkFrame(frame, height=2, width=380, fg_color="red")
-        linha2.pack(padx=10, pady=(5, 20))
+        entry_buscar_cpf = ctk.CTkEntry(frame, fg_color="white", text_color="black", height=30, width=200, placeholder_text="CPF")
+        entry_buscar_cpf.pack(padx=10, pady=5)
+
+        def buscar_cliente():
+            cpf = entry_buscar_cpf.get()
+            response = requests.get(f"http://localhost:5000/clientes/cpf/{cpf}")
+            if response.status_code == 200:
+                cliente = response.json()
+                preencher_formulario(cliente)
+            else:
+                messagebox.showerror("Erro", "Cliente não encontrado.")
+
+        botao_buscar = ctk.CTkButton(frame, text="Buscar", font=("Arial", 18), text_color="white",
+                                    fg_color='#DF4621', command=buscar_cliente)
+        botao_buscar.pack(padx=10, pady=5)
 
         # Labels e Entradas para os dados pessoais organizados em duas colunas
         frame_dados_pessoais = ctk.CTkFrame(frame, corner_radius=10, fg_color="#fa7f72")
@@ -229,7 +267,7 @@ def create_interface():
         # Linha 1
         label_nome = ctk.CTkLabel(frame_dados_pessoais, text="Nome:", font=("Arial", 30), text_color="white")
         label_nome.grid(row=0, column=0, padx=10, pady=5, sticky="w")
-        entry_nome = ctk.CTkEntry(frame_dados_pessoais,  fg_color="white", text_color="black", height=30, width=200)
+        entry_nome = ctk.CTkEntry(frame_dados_pessoais, fg_color="white", text_color="black", height=30, width=200)
         entry_nome.grid(row=0, column=1, padx=10, pady=5, sticky="e")
 
         label_email = ctk.CTkLabel(frame_dados_pessoais, text="E-mail:", font=("Arial", 30), text_color="white")
@@ -240,14 +278,13 @@ def create_interface():
         # Linha 2
         label_telefone = ctk.CTkLabel(frame_dados_pessoais, text="Telefone:", font=("Arial", 30), text_color="white")
         label_telefone.grid(row=1, column=0, padx=10, pady=5, sticky="w")
-        entry_telefone = ctk.CTkEntry(frame_dados_pessoais,  fg_color="white", text_color="black", height=30, width=200)
+        entry_telefone = ctk.CTkEntry(frame_dados_pessoais, fg_color="white", text_color="black", height=30, width=200)
         entry_telefone.grid(row=1, column=1, padx=10, pady=5, sticky="e")
-
 
         # Linha 3
         label_cpf = ctk.CTkLabel(frame_dados_pessoais, text="CPF:", font=("Arial", 30), text_color="white")
         label_cpf.grid(row=2, column=0, padx=10, pady=5, sticky="w")
-        entry_cpf = ctk.CTkEntry(frame_dados_pessoais,  fg_color="white", text_color="black", height=30, width=200)
+        entry_cpf = ctk.CTkEntry(frame_dados_pessoais, fg_color="white", text_color="black", height=30, width=200)
         entry_cpf.grid(row=2, column=1, padx=10, pady=5, sticky="e")
 
         subtitulo3 = ctk.CTkLabel(frame, text="Endereço", text_color="red", font=("Arial", 18))
@@ -281,9 +318,51 @@ def create_interface():
         entry_Numero = ctk.CTkEntry(frame_endereco, fg_color="white", text_color="black", height=30, width=200)
         entry_Numero.grid(row=1, column=3, padx=10, pady=5, sticky="e")
 
-        botao_cadastrar = ctk.CTkButton(frame, text="Confirmar", font=("Arial", 30), text_color="white",
-                                        fg_color='#DF4621')
-        botao_cadastrar.pack(after=frame_endereco, padx=10, pady=15, side='bottom', anchor='s')
+        def preencher_formulario(cliente):
+            entry_nome.delete(0, ctk.END)
+            entry_nome.insert(0, cliente["nome"])
+            entry_email.delete(0, ctk.END)
+            entry_email.insert(0, cliente["email"])
+            entry_telefone.delete(0, ctk.END)
+            entry_telefone.insert(0, cliente["telefone"])
+            entry_cpf.delete(0, ctk.END)
+            entry_cpf.insert(0, cliente["cpf"])
+            entry_CEP.delete(0, ctk.END)
+            entry_CEP.insert(0, cliente["cep"])
+            entry_Bairro.delete(0, ctk.END)
+            entry_Bairro.insert(0, cliente["bairro"])
+            entry_logradouro.delete(0, ctk.END)
+            entry_logradouro.insert(0, cliente["logradouro"])
+            entry_Numero.delete(0, ctk.END)
+            entry_Numero.insert(0, cliente["numero"])
+
+        def atualizar_cliente():
+            try:
+                data = {
+                    "nome": entry_nome.get(),
+                    "email": entry_email.get(),
+                    "telefone": entry_telefone.get(),
+                    "cpf": entry_cpf.get(),
+                    "cep": entry_CEP.get(),
+                    "bairro": entry_Bairro.get(),
+                    "logradouro": entry_logradouro.get(),
+                    "numero": entry_Numero.get()
+                }
+                cpf = entry_cpf.get()
+                response = requests.put(f"http://localhost:5000/clientes/cpf/{cpf}", json=data)
+                if response.status_code == 200:
+                    messagebox.showinfo("Sucesso", "Cliente atualizado com sucesso!")
+                else:
+                    print(f"Erro ao atualizar cliente: {response.status_code}")
+                    print(f"Detalhes do erro: {response.text}")
+                    messagebox.showerror("Erro", f"Falha ao atualizar cliente. Código: {response.status_code}")
+            except ValueError as ve:
+                print(f"Erro ao converter data: {ve}")
+                messagebox.showerror("Erro", "Dados inválidos.")
+
+        botao_atualizar = ctk.CTkButton(frame, text="Atualizar", font=("Arial", 30), text_color="white",
+                                        fg_color='#DF4621', command=atualizar_cliente)
+        botao_atualizar.pack(after=frame_endereco, padx=10, pady=15, side='bottom')
 
     #######################################################################################################################
     #Cadastro de funcionario
@@ -399,8 +478,35 @@ def create_interface():
         entry_funcao = ctk.CTkEntry(frame_admissao, fg_color="white", text_color="black", height=30, width=200)
         entry_funcao.grid(row=0, column=3, padx=10, pady=5, sticky="e")
 
+        def cadastrar_funcionario():
+            try:
+                data = {
+                    "nome": entry_nome.get(),
+                    "email": entry_email.get(),
+                    "telefone": entry_telefone.get(),
+                    "sexo": sexo_var.get(),
+                    "cpf": entry_cpf.get(),
+                    "data_nascimento": datetime.strptime(entry_data_nascimento.get(), "%d/%m/%Y").date().isoformat(),
+                    "cep": entry_CEP.get(),
+                    "bairro": entry_Bairro.get(),
+                    "logradouro": entry_logradouro.get(),
+                    "numero": entry_Numero.get(),
+                    "data_admissao": datetime.strptime(entry_data_admissao.get(), "%d/%m/%Y").date().isoformat(),
+                    "funcao": entry_funcao.get()
+                }
+                response = requests.post("http://localhost:5000/funcionarios", json=data)
+                if response.status_code == 201:
+                    messagebox.showinfo("Sucesso", "Funcionário cadastrado com sucesso!")
+                else:
+                    print(f"Erro ao cadastrar funcionário: {response.status_code}")
+                    print(f"Detalhes do erro: {response.text}")
+                    messagebox.showerror("Erro", f"Falha ao cadastrar funcionário. Código: {response.status_code}")
+            except ValueError as ve:
+                print(f"Erro ao converter data: {ve}")
+                messagebox.showerror("Erro", "Dados inválidos.")
+
         botao_cadastrar = ctk.CTkButton(frame, text="Cadastrar", font=("Arial", 30), text_color="white",
-                                        fg_color='#DF4621')
+                                        fg_color='#DF4621', command=cadastrar_funcionario)
         botao_cadastrar.pack(after=frame_endereco, padx=10, pady=15, side='bottom')
 
         botao_editar = ctk.CTkButton(frame, text="Editar funcionario", font=("Arial", 30), text_color="white",
@@ -422,6 +528,42 @@ def create_interface():
         linha2 = ctk.CTkFrame(frame, height=2, width=380, fg_color="red")
         linha2.pack(padx=10, pady=(5, 20))
 
+        # Entrada para buscar o funcionário pelo CPF
+        label_busca_cpf = ctk.CTkLabel(frame, text="CPF:", font=("Arial", 30), text_color="white")
+        label_busca_cpf.pack(padx=10, pady=5)
+        entry_busca_cpf = ctk.CTkEntry(frame, fg_color="white", text_color="black", height=30, width=200)
+        entry_busca_cpf.pack(padx=10, pady=5)
+
+        def buscar_funcionario():
+            cpf = entry_busca_cpf.get()
+            response = requests.get(f"http://localhost:5000/funcionarios/cpf/{cpf}")
+            if response.status_code == 200:
+                funcionario = response.json()
+                entry_nome.delete(0, ctk.END)
+                entry_nome.insert(0, funcionario['nome'])
+                entry_email.delete(0, ctk.END)
+                entry_email.insert(0, funcionario['email'])
+                entry_telefone.delete(0, ctk.END)
+                entry_telefone.insert(0, funcionario['telefone'])
+                entry_data_nascimento.delete(0, ctk.END)
+                entry_data_nascimento.insert(0, datetime.strptime(funcionario['data_nascimento'], '%Y-%m-%d').strftime('%d/%m/%Y'))
+                entry_CEP.delete(0, ctk.END)
+                entry_CEP.insert(0, funcionario['cep'])
+                entry_Bairro.delete(0, ctk.END)
+                entry_Bairro.insert(0, funcionario['bairro'])
+                entry_logradouro.delete(0, ctk.END)
+                entry_logradouro.insert(0, funcionario['logradouro'])
+                entry_Numero.delete(0, ctk.END)
+                entry_Numero.insert(0, funcionario['numero'])
+                entry_funcao.delete(0, ctk.END)
+                entry_funcao.insert(0, funcionario['funcao'])
+            else:
+                messagebox.showerror("Erro", "Funcionário não encontrado.")
+
+        botao_buscar = ctk.CTkButton(frame, text="Buscar", font=("Arial", 30), text_color="white",
+                                    fg_color='#DF4621', command=buscar_funcionario)
+        botao_buscar.pack(padx=10, pady=15)
+
         # Labels e Entradas para os dados pessoais organizados em duas colunas
         frame_dados_pessoais = ctk.CTkFrame(frame, corner_radius=10, fg_color="#fa7f72")
         frame_dados_pessoais.pack(padx=10, pady=10, expand=False, fill='both')
@@ -429,7 +571,7 @@ def create_interface():
         # Linha 1
         label_nome = ctk.CTkLabel(frame_dados_pessoais, text="Nome:", font=("Arial", 30), text_color="white")
         label_nome.grid(row=0, column=0, padx=10, pady=5, sticky="w")
-        entry_nome = ctk.CTkEntry(frame_dados_pessoais,  fg_color="white", text_color="black", height=30, width=200)
+        entry_nome = ctk.CTkEntry(frame_dados_pessoais, fg_color="white", text_color="black", height=30, width=200)
         entry_nome.grid(row=0, column=1, padx=10, pady=5, sticky="e")
 
         label_email = ctk.CTkLabel(frame_dados_pessoais, text="E-mail:", font=("Arial", 30), text_color="white")
@@ -440,11 +582,17 @@ def create_interface():
         # Linha 2
         label_telefone = ctk.CTkLabel(frame_dados_pessoais, text="Telefone:", font=("Arial", 30), text_color="white")
         label_telefone.grid(row=1, column=0, padx=10, pady=5, sticky="w")
-        entry_telefone = ctk.CTkEntry(frame_dados_pessoais,  fg_color="white", text_color="black", height=30, width=200)
+        entry_telefone = ctk.CTkEntry(frame_dados_pessoais, fg_color="white", text_color="black", height=30, width=200)
         entry_telefone.grid(row=1, column=1, padx=10, pady=5, sticky="e")
 
-
         # Linha 3
+
+        label_data_nascimento = ctk.CTkLabel(frame_dados_pessoais, text="Data de Nascimento:",
+                                            font=("Arial", 30), text_color="white")
+        label_data_nascimento.grid(row=2, column=2, padx=10, pady=5, sticky="w")
+        entry_data_nascimento = ctk.CTkEntry(frame_dados_pessoais, fg_color="white", text_color="black", height=30, width=200)
+        entry_data_nascimento.grid(row=2, column=3, padx=10, pady=5, sticky="e")
+
         subtitulo3 = ctk.CTkLabel(frame, text="Endereço", text_color="red", font=("Arial", 18))
         subtitulo3.pack(padx=10, pady=(5, 5))
 
@@ -490,9 +638,40 @@ def create_interface():
         entry_funcao = ctk.CTkEntry(frame_admissao, fg_color="white", text_color="black", height=30, width=200)
         entry_funcao.grid(row=0, column=3, padx=10, pady=5, sticky="e")
 
+        def editar_funcionario():
+            try:
+                data = {
+                    "nome": entry_nome.get(),
+                    "email": entry_email.get(),
+                    "telefone": entry_telefone.get(),
+                    "data_nascimento": datetime.strptime(entry_data_nascimento.get(), "%d/%m/%Y").date().isoformat(),
+                    "cep": entry_CEP.get(),
+                    "bairro": entry_Bairro.get(),
+                    "logradouro": entry_logradouro.get(),
+                    "numero": entry_Numero.get(),
+                    "funcao": entry_funcao.get()
+                }
+                cpf = entry_busca_cpf.get()
+                response = requests.get(f"http://localhost:5000/funcionarios/cpf/{cpf}")
+                if response.status_code == 200:
+                    funcionario = response.json()
+                    response_update = requests.put(f"http://localhost:5000/funcionarios/{funcionario['id']}", json=data)
+                    if response_update.status_code == 200:
+                        messagebox.showinfo("Sucesso", "Funcionário atualizado com sucesso!")
+                    else:
+                        print(f"Erro ao atualizar funcionário: {response_update.status_code}")
+                        print(f"Detalhes do erro: {response_update.text}")
+                        messagebox.showerror("Erro", f"Falha ao atualizar funcionário. Código: {response_update.status_code}")
+                else:
+                    messagebox.showerror("Erro", "Funcionário não encontrado.")
+            except ValueError as ve:
+                print(f"Erro ao converter data: {ve}")
+                messagebox.showerror("Erro", "Dados inválidos.")
+
         botao_cadastrar = ctk.CTkButton(frame, text="Confirmar", font=("Arial", 30), text_color="white",
-                                        fg_color='#DF4621')
+                                        fg_color='#DF4621', command=editar_funcionario)
         botao_cadastrar.pack(after=frame_endereco, padx=10, pady=15, side='bottom')
+
 
     ####################################################################################################################
     #Agendamento

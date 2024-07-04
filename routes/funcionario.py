@@ -29,6 +29,25 @@ def get_funcionario(id):
         'telefone': funcionario.telefone,
         'sexo': funcionario.sexo,
         'cpf': funcionario.cpf,
+        'data_nascimento': funcionario.data_nascimento.strftime('%d/%m/%Y'),
+        'cep': funcionario.cep,
+        'bairro': funcionario.bairro,
+        'logradouro': funcionario.logradouro,
+        'numero': funcionario.numero,
+        'data_admissao': funcionario.data_admissao.strftime('%d/%m/%Y'),
+        'funcao': funcionario.funcao
+    })
+
+@bp.route('/funcionarios/cpf/<string:cpf>', methods=['GET'])
+def get_funcionario_by_cpf(cpf):
+    funcionario = Funcionario.query.filter_by(cpf=cpf).first_or_404()
+    return jsonify({
+        'id': funcionario.id,
+        'nome': funcionario.nome,
+        'email': funcionario.email,
+        'telefone': funcionario.telefone,
+        'sexo': funcionario.sexo,
+        'cpf': funcionario.cpf,
         'data_nascimento': funcionario.data_nascimento.strftime('%Y-%m-%d'),
         'cep': funcionario.cep,
         'bairro': funcionario.bairro,
@@ -58,12 +77,12 @@ def update_funcionario(id):
             'telefone': funcionario.telefone,
             'sexo': funcionario.sexo,
             'cpf': funcionario.cpf,
-            'data_nascimento': funcionario.data_nascimento.strftime('%Y-%m-%d'),
+            'data_nascimento': funcionario.data_nascimento.strftime('%d/%m/%Y'),
             'cep': funcionario.cep,
             'bairro': funcionario.bairro,
             'logradouro': funcionario.logradouro,
             'numero': funcionario.numero,
-            'data_admissao': funcionario.data_admissao.strftime('%Y-%m-%d'),
+            'data_admissao': funcionario.data_admissao.strftime('%d/%m/%Y'),
             'funcao': funcionario.funcao
         })
     except Exception as e:
