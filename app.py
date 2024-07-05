@@ -65,6 +65,10 @@ def create_interface():
         apagar_frames_para_o_proximo()
         frame_agenda()
 
+    def ver_agendamentos():
+        apagar_frames_para_o_proximo()
+        frame_ver_agendamentos()
+
     def editar_agendamento():
         apagar_frames_para_o_proximo()
         frame_editar_agendamento()
@@ -694,15 +698,16 @@ def create_interface():
         frame_dados_pessoais.pack(padx=10, pady=10, expand=False, fill='both')
 
         # Linha 1
-        label_CPF = ctk.CTkLabel(frame_dados_pessoais, text="CPF", font=("Arial", 30), text_color="white")
+        label_CPF = ctk.CTkLabel(frame_dados_pessoais, text="CPF Cliente", font=("Arial", 30), text_color="white")
         label_CPF.grid(row=0, column=0, padx=10, pady=5, sticky="w")
-        entry_nome = ctk.CTkEntry(frame_dados_pessoais,  fg_color="white", text_color="black", height=30, width=200)
-        entry_nome.grid(row=0, column=1, padx=10, pady=5, sticky="e")
+        entry_CPF_cliente = ctk.CTkEntry(frame_dados_pessoais, fg_color="white", text_color="black", height=30, width=200)
+        entry_CPF_cliente.grid(row=0, column=1, padx=10, pady=5, sticky="e")
 
-        # Linha 2
+        label_CPF_funcionario = ctk.CTkLabel(frame_dados_pessoais, text="CPF Funcionário", font=("Arial", 30), text_color="white")
+        label_CPF_funcionario.grid(row=1, column=0, padx=10, pady=5, sticky="w")
+        entry_CPF_funcionario = ctk.CTkEntry(frame_dados_pessoais, fg_color="white", text_color="black", height=30, width=200)
+        entry_CPF_funcionario.grid(row=1, column=1, padx=10, pady=5, sticky="e")
 
-
-        # Linha 3
         linha4 = ctk.CTkFrame(frame, height=2, width=380, fg_color="red")
         linha4.pack(padx=10, pady=(5, 20))
 
@@ -712,43 +717,121 @@ def create_interface():
         # Linha 1 (Endereço)
         label_CEP = ctk.CTkLabel(frame_endereco, text="Procedimento:", font=("Arial", 30), text_color="white")
         label_CEP.grid(row=0, column=0, padx=10, pady=5, sticky="w")
-        entry_CEP = ctk.CTkEntry(frame_endereco, fg_color="white", text_color="black", height=30, width=200)
-        entry_CEP.grid(row=0, column=1, padx=10, pady=5, sticky="e")
+        entry_procedimento = ctk.CTkEntry(frame_endereco, fg_color="white", text_color="black", height=30, width=200)
+        entry_procedimento.grid(row=0, column=1, padx=10, pady=5, sticky="e")
 
         label_Bairro = ctk.CTkLabel(frame_endereco, text="Profissional:", font=("Arial", 30), text_color="white")
         label_Bairro.grid(row=0, column=2, padx=10, pady=5, sticky="w")
-        entry_Bairro = ctk.CTkEntry(frame_endereco, fg_color="white", text_color="black", height=30, width=200)
-        entry_Bairro.grid(row=0, column=3, padx=10, pady=5, sticky="e")
+        entry_profissional = ctk.CTkEntry(frame_endereco, fg_color="white", text_color="black", height=30, width=200)
+        entry_profissional.grid(row=0, column=3, padx=10, pady=5, sticky="e")
 
         # Linha 2 (Endereço)
         label_logradouro = ctk.CTkLabel(frame_endereco, text="Data:", font=("Arial", 30), text_color="white")
         label_logradouro.grid(row=1, column=0, padx=10, pady=5, sticky="w")
-        entry_logradouro = ctk.CTkEntry(frame_endereco, fg_color="white", text_color="black", height=30, width=200)
-        entry_logradouro.grid(row=1, column=1, padx=10, pady=5, sticky="e")
+        entry_data = ctk.CTkEntry(frame_endereco, fg_color="white", text_color="black", height=30, width=200)
+        entry_data.grid(row=1, column=1, padx=10, pady=5, sticky="e")
 
-        label_Numero = ctk.CTkLabel(frame_endereco, text="horario:", font=("Arial", 30), text_color="white")
+        label_Numero = ctk.CTkLabel(frame_endereco, text="horário:", font=("Arial", 30), text_color="white")
         label_Numero.grid(row=1, column=2, padx=10, pady=5, sticky="w")
-        entry_Numero = ctk.CTkEntry(frame_endereco, fg_color="white", text_color="black", height=30, width=200)
-        entry_Numero.grid(row=1, column=3, padx=10, pady=5, sticky="e")
+        entry_horario = ctk.CTkEntry(frame_endereco, fg_color="white", text_color="black", height=30, width=200)
+        entry_horario.grid(row=1, column=3, padx=10, pady=5, sticky="e")
 
         linha2 = ctk.CTkFrame(frame, height=2, width=380, fg_color="red")
         linha2.pack(padx=10, pady=(5, 20))
 
+        def cadastrar_agendamento():
+            cpf_cliente = entry_CPF_cliente.get()
+            cpf_funcionario = entry_CPF_funcionario.get()
+
+            cliente_response = requests.get(f"http://localhost:5000/clientes/cpf/{cpf_cliente}")
+            funcionario_response = requests.get(f"http://localhost:5000/funcionarios/cpf/{cpf_funcionario}")
+
+            if cliente_response.status_code != 200:
+                messagebox.showerror("Erro", f"Cliente não encontrado. Código: {cliente_response.status_code}")
+                return
+
+            if funcionario_response.status_code != 200:
+                messagebox.showerror("Erro", f"Funcionário não encontrado. Código: {funcionario_response.status_code}")
+                return
+
+            cliente_id = cliente_response.json().get("id")
+            funcionario_id = funcionario_response.json().get("id")
+
+            # Convertendo a data e o horário para o formato esperado pelo backend
+            try:
+                data_agendamento = datetime.strptime(f"{entry_data.get()} {entry_horario.get()}", "%d/%m/%Y %H:%M")
+                data_agendamento_str = data_agendamento.strftime("%Y-%m-%d %H:%M:%S")
+            except ValueError:
+                messagebox.showerror("Erro", "Formato de data ou horário inválido. Use dd/mm/yyyy hh:mm")
+                return
+
+            data = {
+                "cliente_id": cliente_id,
+                "funcionario_id": funcionario_id,
+                "data_agendamento": data_agendamento_str,
+                "servico": entry_procedimento.get()
+            }
+
+            response = requests.post("http://localhost:5000/agendamentos", json=data)
+            if response.status_code == 201:
+                messagebox.showinfo("Sucesso", "Agendamento cadastrado com sucesso!")
+            else:
+                print(f"Erro ao cadastrar agendamento: {response.status_code}")
+                print(f"Detalhes do erro: {response.text}")
+                messagebox.showerror("Erro", f"Falha ao cadastrar agendamento. Código: {response.status_code}")
 
         botao_cadastrar = ctk.CTkButton(frame, text="Cadastrar", font=("Arial", 30), text_color="white",
-                                    fg_color='#DF4621')
+                                        fg_color='#DF4621', command=cadastrar_agendamento)
         botao_cadastrar.pack(after=frame_endereco, padx=10, pady=15, side='bottom')
 
         botao_editar = ctk.CTkButton(frame, text="Editar Agendamento", font=("Arial", 30), text_color="white",
-                                fg_color='#DF4621', command=editar_agendamento)
+                                    fg_color='#DF4621', command=editar_agendamento)
         botao_editar.pack(after=frame_endereco, padx=10, pady=15, side='bottom')
+
+        botao_ver_agendamentos = ctk.CTkButton(frame, text="Ver Agendamentos", font=("Arial", 30), text_color="white",
+                                            fg_color='#DF4621', command=ver_agendamentos)
+        botao_ver_agendamentos.pack(after=frame_endereco, padx=10, pady=15, side='bottom')
+
+
+    def frame_ver_agendamentos():
+        frame = ctk.CTkFrame(frameAuxiliar, corner_radius=10, fg_color=frame_cor)
+        frame.pack(side="left", fill="both", expand=True, padx=20, pady=20)
+
+        # Conteúdo do frame à direita
+        texto_direita = ctk.CTkLabel(frame, text="VER AGENDAMENTOS", font=("Arial", 30), text_color="white")
+        texto_direita.pack(padx=10, pady=10)
+
+        linha = ctk.CTkFrame(frame, height=2, width=380, fg_color="red")
+        linha.pack(padx=10, pady=(5, 20))
+
+        lista_agendamentos = ctk.CTkFrame(frame, corner_radius=10, fg_color="#fa7f72")
+        lista_agendamentos.pack(padx=10, pady=10, expand=True, fill='both')
+
+        def carregar_agendamentos():
+            response = requests.get("http://localhost:5000/agendamentos")
+            if response.status_code == 200:
+                agendamentos = response.json()
+                for agendamento in agendamentos:
+                    item_frame = ctk.CTkFrame(lista_agendamentos, corner_radius=10, fg_color="white")
+                    item_frame.pack(padx=10, pady=5, fill='x')
+                    label_info = ctk.CTkLabel(item_frame, text=f"Nome do Cliente: {agendamento['cliente_nome']}, "
+                                                            f"Funcionário Responsável: {agendamento['funcionario_nome']}, "
+                                                            f"Data: {agendamento['data_agendamento']}, "
+                                                            f"Serviço: {agendamento['servico']}",
+                                            font=("Arial", 20), text_color="black")
+                    label_info.pack(padx=10, pady=5)
+            else:
+                print(response.text)
+                messagebox.showerror("Erro", f"Falha ao carregar agendamentos. Código: {response.status_code}")
+
+        carregar_agendamentos()
 
     def frame_editar_agendamento():
         frame = ctk.CTkFrame(frameAuxiliar, corner_radius=10, fg_color=frame_cor)
         frame.pack(side="left", fill="both", expand=True, padx=20, pady=20)
 
-    # Conteúdo do frame à direita
-        texto_direita = ctk.CTkLabel(frame, text="AGENDAMENTO", font=("Arial", 30), text_color="white")
+        # Conteúdo do frame à direita
+        texto_direita = ctk.CTkLabel(frame, text="EDITAR AGENDAMENTO", font=("Arial", 30), text_color="white")
         texto_direita.pack(padx=10, pady=10)
 
         subtitulo2 = ctk.CTkLabel(frame, text="Identificador", text_color="red", font=("Arial", 18))
@@ -757,46 +840,96 @@ def create_interface():
         linha2 = ctk.CTkFrame(frame, height=2, width=380, fg_color="red")
         linha2.pack(padx=10, pady=(5, 20))
 
-    # Labels e Entradas para os dados pessoais organizados em duas colunas
+        # Labels e Entradas para os dados pessoais organizados em duas colunas
         frame_dados_pessoais = ctk.CTkFrame(frame, corner_radius=10, fg_color="#fa7f72")
         frame_dados_pessoais.pack(padx=10, pady=10, expand=False, fill='both')
 
-    # Linha 1
-        label_CPF = ctk.CTkLabel(frame_dados_pessoais, text="CPF", font=("Arial", 30), text_color="white")
+        # Linha 1
+        label_CPF = ctk.CTkLabel(frame_dados_pessoais, text="CPF Cliente", font=("Arial", 30), text_color="white")
         label_CPF.grid(row=0, column=0, padx=10, pady=5, sticky="w")
-        entry_nome = ctk.CTkEntry(frame_dados_pessoais,  fg_color="white", text_color="black", height=30, width=200)
-        entry_nome.grid(row=0, column=1, padx=10, pady=5, sticky="e")
+        entry_CPF = ctk.CTkEntry(frame_dados_pessoais, fg_color="white", text_color="black", height=30, width=200)
+        entry_CPF.grid(row=0, column=1, padx=10, pady=5, sticky="e")
 
-    # Linha 2
+        label_data_original = ctk.CTkLabel(frame_dados_pessoais, text="Data Original", font=("Arial", 30), text_color="white")
+        label_data_original.grid(row=1, column=0, padx=10, pady=5, sticky="w")
+        entry_data_original = ctk.CTkEntry(frame_dados_pessoais, fg_color="white", text_color="black", height=30, width=200)
+        entry_data_original.grid(row=1, column=1, padx=10, pady=5, sticky="e")
 
-
-    # Linha 3
         linha4 = ctk.CTkFrame(frame, height=2, width=380, fg_color="red")
         linha4.pack(padx=10, pady=(5, 20))
 
         frame_dados_agendamento = ctk.CTkFrame(frame, corner_radius=10, fg_color="#fa7f72")
         frame_dados_agendamento.pack(padx=10, pady=10, expand=False, fill='both')
 
-    # Linha 1 (Endereço)
-        label_Data_Original = ctk.CTkLabel(frame_dados_agendamento, text="Data original:", font=("Arial", 30), text_color="white")
-        label_Data_Original.grid(row=0, column=0, padx=10, pady=5, sticky="w")
-        entry_Data_original = ctk.CTkEntry(frame_dados_agendamento, fg_color="white", text_color="black", height=30, width=200)
-        entry_Data_original.grid(row=0, column=1, padx=10, pady=5, sticky="e")
+        # Linha 1 (Endereço)
+        label_nova_data = ctk.CTkLabel(frame_dados_agendamento, text="Nova Data", font=("Arial", 30), text_color="white")
+        label_nova_data.grid(row=0, column=0, padx=10, pady=5, sticky="w")
+        entry_nova_data = ctk.CTkEntry(frame_dados_agendamento, fg_color="white", text_color="black", height=30, width=200)
+        entry_nova_data.grid(row=0, column=1, padx=10, pady=5, sticky="e")
 
-        label_Bairro = ctk.CTkLabel(frame_dados_agendamento, text="Nova Data:", font=("Arial", 30), text_color="white")
-        label_Bairro.grid(row=0, column=2, padx=10, pady=5, sticky="w")
-        entry_Bairro = ctk.CTkEntry(frame_dados_agendamento, fg_color="white", text_color="black", height=30, width=200)
-        entry_Bairro.grid(row=0, column=3, padx=10, pady=5, sticky="e")
+        label_novo_horario = ctk.CTkLabel(frame_dados_agendamento, text="Novo Horário", font=("Arial", 30), text_color="white")
+        label_novo_horario.grid(row=1, column=0, padx=10, pady=5, sticky="w")
+        entry_novo_horario = ctk.CTkEntry(frame_dados_agendamento, fg_color="white", text_color="black", height=30, width=200)
+        entry_novo_horario.grid(row=1, column=1, padx=10, pady=5, sticky="e")
 
-    # Linha 2 (Endereço)
-        label_horario = ctk.CTkLabel(frame_dados_agendamento, text="Horario:", font=("Arial", 30), text_color="white")
-        label_horario.grid(row=1, column=0, padx=10, pady=5, sticky="w")
-        entry_horario = ctk.CTkEntry(frame_dados_agendamento, fg_color="white", text_color="black", height=30, width=200)
-        entry_horario.grid(row=1, column=1, padx=10, pady=5, sticky="e")
+        def buscar_agendamento():
+            cpf_cliente = entry_CPF.get()
+            data_original = entry_data_original.get()
 
-        botao_cadastrar = ctk.CTkButton(frame, text="Confirmar", font=("Arial", 30), text_color="white",
-                                        fg_color='#DF4621')
-        botao_cadastrar.pack(after=frame_dados_agendamento, padx=10, pady=15, side='bottom')
+            try:
+                data_obj = datetime.strptime(data_original, "%d/%m/%Y")
+                data_str = data_obj.strftime("%Y-%m-%d")
+            except ValueError:
+                messagebox.showerror("Erro", "Formato de data inválido. Use dd/mm/yyyy")
+                return
+
+            response = requests.get(f"http://localhost:5000/agendamentos/search?cpf_cliente={cpf_cliente}&data_agendamento={data_str}")
+            if response.status_code == 200:
+                agendamento = response.json()
+                entry_nova_data.delete(0, 'end')
+                entry_nova_data.insert(0, data_obj.strftime("%d/%m/%Y"))
+                entry_novo_horario.delete(0, 'end')
+                entry_novo_horario.insert(0, datetime.strptime(agendamento['data_agendamento'], "%Y-%m-%d %H:%M:%S").strftime("%H:%M"))
+            else:
+                messagebox.showerror("Erro", f"Agendamento não encontrado. Código: {response.status_code}")
+
+        def confirmar_edicao():
+            cpf_cliente = entry_CPF.get()
+            data_original = entry_data_original.get()
+            nova_data = entry_nova_data.get()
+            novo_horario = entry_novo_horario.get()
+
+            try:
+                data_obj = datetime.strptime(nova_data, "%d/%m/%Y")
+                horario_obj = datetime.strptime(novo_horario, "%H:%M")
+                data_agendamento_str = datetime.combine(data_obj, horario_obj.time()).strftime("%Y-%m-%d %H:%M:%S")
+            except ValueError:
+                messagebox.showerror("Erro", "Formato de data ou horário inválido. Use dd/mm/yyyy para a data e HH:MM para o horário.")
+                return
+
+            response = requests.get(f"http://localhost:5000/agendamentos/search?cpf_cliente={cpf_cliente}&data_agendamento={datetime.strptime(data_original, '%d/%m/%Y').strftime('%Y-%m-%d')}")
+            if response.status_code != 200:
+                messagebox.showerror("Erro", "Agendamento original não encontrado.")
+                return
+
+            agendamento_id = response.json().get('id')
+            data = {
+                "data_agendamento": data_agendamento_str
+            }
+
+            response = requests.put(f"http://localhost:5000/agendamentos/{agendamento_id}", json=data)
+            if response.status_code == 200:
+                messagebox.showinfo("Sucesso", "Agendamento atualizado com sucesso!")
+            else:
+                messagebox.showerror("Erro", f"Falha ao atualizar agendamento. Código: {response.status_code}")
+
+        botao_buscar = ctk.CTkButton(frame, text="Buscar Agendamento", font=("Arial", 30), text_color="white",
+                                    fg_color='#DF4621', command=buscar_agendamento)
+        botao_buscar.pack(after=frame_dados_agendamento, padx=10, pady=15, side='bottom')
+
+        botao_confirmar = ctk.CTkButton(frame, text="Confirmar", font=("Arial", 30), text_color="white",
+                                        fg_color='#DF4621', command=confirmar_edicao)
+        botao_confirmar.pack(after=frame_dados_agendamento, padx=10, pady=15, side='bottom')
 
     ####################################################################################################################
     # lado esquerdo, navegação
